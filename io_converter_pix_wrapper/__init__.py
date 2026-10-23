@@ -2,7 +2,7 @@ bl_info = {
     "name": "ConverterPIX Wrapper for conversion & import of SCS Game Models",
     "description": "Wrapper add-on to use ConvPIX within the Blender and import SCS game models with ease.",
     "author": "Simon Lusenc (50keda)",
-    "version": (2, 3),
+    "version": (2, 4),
     "blender": (2, 81, 0),
     "location": "File > Import > SCS Models - ConverterPIX & BT (*.scs)",
     "category": "Import-Export",
@@ -830,16 +830,15 @@ def register():
     # check if converter pix exists or it's not to more than 1 day old, otherwise redownload it!
     if not os.path.isfile(CONVERTER_PIX_PATH) or time() - os.path.getmtime(CONVERTER_PIX_PATH) > 60 * 60 * 24:
 
-        t = Thread(name="update converterpix", target=update_converter_pix)
-        t.setDaemon(True)
+        t = Thread(name="update converterpix", target=update_converter_pix, daemon=True)
         t.start()
 
 
 def unregister():
-    for cls in classes:
-        bpy.utils.unregister_class(cls)
-
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
+
+    for cls in reversed(classes):
+        bpy.utils.unregister_class(cls)
 
 
 if __name__ == '__main__':
